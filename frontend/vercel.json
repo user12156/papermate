@@ -5,10 +5,14 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://3.37.86.161:8008/api/:path*"
+      "destination": "http://35.173.236.21:8000/api/:path*"
     },
     {
-      "source": "/((?!api/.*).*)",
+      "source": "/auth/:path*",
+      "destination": "http://35.173.236.21:8000/auth/:path*"
+    },
+    {
+      "source": "/((?!api/.*|auth/.*).*)",
       "destination": "/index.html"
     }
   ]
