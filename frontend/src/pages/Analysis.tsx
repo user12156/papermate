@@ -256,11 +256,16 @@ const hasVisualPayload = (message: any = {}) => {
   return data.length > 0 || rows.length > 0 || columns.length > 0 || series.length > 0 || items.length > 0 || Boolean(message.chartType);
 };
 
+const isVisualAnswerPayload = (payload: any = {}) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  return hasVisualPayload(payload) || isVisualStorageItem(payload);
+};
+
 const normalizeRestoredThread = (thread: any[] = []) =>
   thread
     .map((message, index) => {
       if (!message) return null;
-      const rawType = message.type || message.kind;
+      const rawType = String(message.type || message.kind || '').toLowerCase();
       const title = String(message.title || '').trim();
       const text = String(message.text || '').trim();
       const base = {
@@ -1375,7 +1380,7 @@ function AnalysisC({ projectId, projectTitle, restoredData, newAnalysisSignal, c
       let isJsonAsset = false;
       try {
         parsedAssetData = parseVisualJsonFromAnswer(answer);
-        if (parsedAssetData) {
+        if (isVisualAnswerPayload(parsedAssetData)) {
           isJsonAsset = true;
         }
       } catch (e) {

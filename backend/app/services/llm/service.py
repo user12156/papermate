@@ -10,6 +10,11 @@ from app.services.llm.response_utils import llm_error
 from app.services.table.chart_request_parser import parse_chart_request
 from app.services.table.table_chart_builder import try_build_chart_from_tables
 
+try:
+    from app.services.llm.gemini_provider import analyze_with_gemini
+except Exception:
+    analyze_with_gemini = None
+
 
 MISSING_API_KEY_MESSAGE = "PaperMate 분석 키가 없어 기본 문서 추출로 응답했습니다."
 
@@ -48,14 +53,21 @@ def _compare_response(compare_payload: dict, provider: str, model: str | None = 
 def analyze_with_llm(
     question: str,
     extracted_docs: list[dict],
-    provider: str = "openai",
+    provider: str = "gemini",
     openai_api_key: str | None = None,
     analysis_text: str = "",
     relevant_chunks: list[dict] | None = None,
     web_docs: list[dict] | None = None,
 ) -> dict:
-    provider_name = "openai"
-    model_name = settings.openai_model
+    gemini_api_key = getattr(settings, "gemini_api_key", None)
+    gemini_model = getattr(settings, "gemini_model", "gemini-1.5-flash")
+
+    if gemini_api_key and analyze_with_gemini:
+        provider_name = "gemini"
+        model_name = gemini_model
+    else:
+        provider_name = "openai"
+        model_name = settings.openai_model
 
     if is_compare_request(question) or len([doc for doc in extracted_docs if str(doc.get("text", "")).strip()]) >= 2:
         compare_payload = build_document_compare_answer(question, extracted_docs)
@@ -77,7 +89,18 @@ def analyze_with_llm(
                 model_name,
             )
 
+    if gemini_api_key and analyze_with_gemini:
+        return analyze_with_gemini(
+            question,
+            extracted_docs,
+            gemini_api_key,
+            analysis_text,
+            relevant_chunks,
+            web_docs,
+        )
+
     api_key = openai_api_key or settings.openai_api_key
     if not api_key:
         return llm_error(MISSING_API_KEY_MESSAGE, "openai", settings.openai_model)
+
     return analyze_with_openai(question, extracted_docs, api_key, analysis_text, relevant_chunks, web_docs)
