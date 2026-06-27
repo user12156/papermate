@@ -292,9 +292,17 @@ def _resolve_llm_provider_and_keys(
 ) -> tuple[str, str, str, bool]:
     """요청값과 환경변수를 합쳐 실제 사용할 OpenAI provider/key를 결정합니다."""
 
+    requested_provider = (provider or "gemini").strip().lower()
+    if requested_provider not in {"auto", "gemini", "openai"}:
+        requested_provider = "gemini"
+
+    env_gemini = getattr(settings, "gemini_api_key", "")
+    if requested_provider in {"auto", "gemini"}:
+        key_source = "env" if env_gemini else "none"
+        return "gemini", env_gemini, key_source, key_source != "none"
+
     request_openai = (openai_api_key or "").strip()
     env_openai = settings.openai_api_key
-
     key_source = "request" if request_openai else "env" if env_openai else "none"
     return "openai", request_openai or env_openai, key_source, key_source != "none"
 
@@ -304,7 +312,7 @@ def run_analysis_pipeline(
     question: str,
     extracted_docs: list[dict],
     uploaded_filenames: list[str] | None = None,
-    llm_provider: str = "openai",
+    llm_provider: str = "gemini",
     openai_api_key: str | None = None,
     analysis_text: str = "",
 ) -> dict:

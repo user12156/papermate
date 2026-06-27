@@ -59,10 +59,15 @@ def analyze_with_llm(
     relevant_chunks: list[dict] | None = None,
     web_docs: list[dict] | None = None,
 ) -> dict:
+    requested_provider = (provider or "gemini").strip().lower()
+    if requested_provider not in {"auto", "gemini", "openai"}:
+        requested_provider = "gemini"
+
     gemini_api_key = getattr(settings, "gemini_api_key", None)
     gemini_model = getattr(settings, "gemini_model", "gemini-1.5-flash")
+    has_gemini = bool(gemini_api_key and analyze_with_gemini)
 
-    if gemini_api_key and analyze_with_gemini:
+    if requested_provider in {"auto", "gemini"} and has_gemini:
         provider_name = "gemini"
         model_name = gemini_model
     else:
@@ -89,7 +94,7 @@ def analyze_with_llm(
                 model_name,
             )
 
-    if gemini_api_key and analyze_with_gemini:
+    if requested_provider in {"auto", "gemini"} and has_gemini:
         return analyze_with_gemini(
             question,
             extracted_docs,
@@ -98,6 +103,9 @@ def analyze_with_llm(
             relevant_chunks,
             web_docs,
         )
+
+    if requested_provider == "gemini":
+        return llm_error("Gemini API 키가 없어 기본 문서 추출로 응답했습니다.", "gemini", gemini_model)
 
     api_key = openai_api_key or settings.openai_api_key
     if not api_key:

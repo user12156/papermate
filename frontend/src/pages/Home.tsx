@@ -216,6 +216,19 @@ function Home() {
     syncBrowserHistory(nextView, replace);
   };
 
+  const startFreshAnalysis = () => {
+    sessionStorage.setItem("papermate.skipActiveAnalysisRestore", "1");
+    const activeAnalysisKey = getActiveAnalysisSessionKey();
+    localStorage.removeItem(activeAnalysisKey);
+    window.dispatchEvent(new CustomEvent("papermate-storage-updated", {
+      detail: { key: activeAnalysisKey },
+    }));
+    setRestoredData(null);
+    setNewAnalysisSignal((prev) => prev + 1);
+    setAnalysisSessionKey(`analysis-new-${Date.now()}-${Math.random()}`);
+    navigateToView(VIEW.ANALYSIS, { clearRestoredData: true });
+  };
+
   useEffect(() => {
     syncBrowserHistory(viewMode, true);
 
@@ -290,22 +303,11 @@ function Home() {
     if (menuName === VIEW.SHARE)
       navigateToView(VIEW.SHARE, { clearShareOpenData: true });
     else if (menuName === VIEW.ANALYSIS) {
-      setAnalysisSessionKey(`analysis-${Date.now()}`);
-      navigateToView(VIEW.ANALYSIS, { clearRestoredData: true });
+      startFreshAnalysis();
     } else if (menuName === VIEW.PROJECTS) navigateToView(VIEW.PROJECTS);
     else if (menuName === VIEW.MYPAGE || menuName === "프로필")
       navigateToView(VIEW.MYPAGE);
-    else if (menuName === "새 채팅") {
-      sessionStorage.setItem("papermate.skipActiveAnalysisRestore", "1");
-      const activeAnalysisKey = getActiveAnalysisSessionKey();
-      localStorage.removeItem(activeAnalysisKey);
-      window.dispatchEvent(new CustomEvent("papermate-storage-updated", {
-        detail: { key: activeAnalysisKey },
-      }));
-      setNewAnalysisSignal((prev) => prev + 1);
-      setAnalysisSessionKey(`analysis-new-${Date.now()}-${Math.random()}`);
-      navigateToView(VIEW.ANALYSIS, { clearRestoredData: true });
-    }
+    else if (menuName === "새 채팅") startFreshAnalysis();
   };
 
   const openLoginPopup = () => {

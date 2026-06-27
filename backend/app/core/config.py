@@ -102,6 +102,8 @@ class Settings:
     hwp_parser_timeout_seconds: int
     openai_api_key: str
     openai_model: str
+    gemini_api_key: str
+    gemini_model: str
     anthropic_api_key: str
     anthropic_vision_model: str
     google_client_id: str
@@ -173,6 +175,8 @@ def create_settings() -> Settings:
         hwp_parser_timeout_seconds=_env_int("HWP_PARSER_TIMEOUT_SECONDS", 30),
         openai_api_key=os.getenv("OPENAI_API_KEY", "").strip(),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini").strip(),
+        gemini_api_key=os.getenv("GEMINI_API_KEY", "").strip(),
+        gemini_model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip(),
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", "").strip(),
         anthropic_vision_model=os.getenv("ANTHROPIC_VISION_MODEL", "claude-3-5-sonnet-20241022").strip(),
         google_client_id=(os.getenv("GOOGLE_CLIENT_ID") or os.getenv("VITE_GOOGLE_CLIENT_ID", "")).strip(),

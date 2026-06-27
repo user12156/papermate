@@ -140,6 +140,7 @@ export const analysisAPI = {
   chat: (question: string, files: File[], options: AnalysisChatOptions = {}, analysisText = '') => {
     const formData = new FormData();
     formData.append('question', question);
+    formData.append('llm_provider', 'gemini');
     if (options.conversationId) formData.append('conversation_id', options.conversationId);
     (options.documentIds || []).forEach((documentId) => {
       formData.append('document_ids', documentId);

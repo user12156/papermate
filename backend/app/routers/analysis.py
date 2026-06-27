@@ -93,7 +93,7 @@ async def analyze_chat(
     conversation_id: str = Form(""),
     document_ids: list[str] = Form(default=[]),
     use_current_files_only: str = Form("false"),
-    llm_provider: str = Form("auto"),
+    llm_provider: str = Form("gemini"),
     openai_api_key: str = Form(""),
     files: list[UploadFile] = File(default=[]),
     analysis_text: str = Form(""),
