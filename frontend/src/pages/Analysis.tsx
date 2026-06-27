@@ -2005,9 +2005,14 @@ function AnalysisC({ projectId, projectTitle, restoredData, newAnalysisSignal, c
                         <div className="suggested-questions">
                           {message.suggestedQuestions.map((q, idx) => (
                             <button 
+                              type="button"
                               key={idx} 
                               className={suggestionChipClass(q)}
-                              onClick={() => handleSendMessage(files, q, { suggestedDepth: (message.suggestedDepth || 0) + 1 })}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                handleSendMessage([], q, { suggestedDepth: (message.suggestedDepth || 0) + 1 });
+                              }}
                             >
                               {q}
                             </button>
@@ -2035,9 +2040,14 @@ function AnalysisC({ projectId, projectTitle, restoredData, newAnalysisSignal, c
                         <div className="suggested-questions">
                           {message.suggestedQuestions.map((q: string, idx: number) => (
                             <button 
+                              type="button"
                               key={idx} 
                               className={suggestionChipClass(q)}
-                              onClick={() => handleSendMessage(files, q, { suggestedDepth: (message.suggestedDepth || 0) + 1 })}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                handleSendMessage([], q, { suggestedDepth: (message.suggestedDepth || 0) + 1 });
+                              }}
                             >
                               {q}
                             </button>
