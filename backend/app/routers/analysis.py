@@ -177,6 +177,8 @@ async def analyze_chat(
             "intent": "system",
         }
 
+    llm_provider = "gemini"
+
     return run_analysis_pipeline(
         question=question,
         extracted_docs=extracted_docs,
