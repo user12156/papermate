@@ -102,7 +102,18 @@ async def analyze_chat(
 ):
     # compare_mode는 프론트에서 "여러 논문/문서를 서로 비교"하는 화면 상태를 넘겨주는 값입니다.
     # 이 값이 true면 selected_source_name이 있어도 특정 파일 하나로 좁히지 않습니다.
+    question = question.strip()
     analysis_text = analysis_text.strip()
+
+    is_visual_followup = (
+        question.startswith("[추천 시각화:")
+        or "표로 정리" in question
+        or "그래프" in question
+        or "차트" in question
+    )
+    if is_visual_followup:
+        analysis_text = ""
+
     session_key = conversation_id.strip()
     should_compare = _is_truthy(compare_mode)
     current_files_only = _is_truthy(use_current_files_only)
